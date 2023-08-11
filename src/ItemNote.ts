@@ -245,7 +245,7 @@ export type CreateOrOpenItemNoteFn = (
   pocketItem: SavedPocketItem
 ) => Promise<void>;
 
-const findPathForNewPocketItem = (
+const findPathForNewPocketItem = async (
   settingsManager: SettingsManager,
   vault: Vault,
   pocketItem: SavedPocketItem
@@ -254,23 +254,28 @@ const findPathForNewPocketItem = (
   const linkpath = linkpathForSavedPocketItem(pocketItem);
 
   const candidatePath = `${itemNotesFolder}/${linkpath}.md`;
-  if (vault.getAbstractFileByPath(candidatePath) === null) {
+  const abstractFile = vault.getAbstractFileByPath(candidatePath);
+  if (abstractFile === null) {
     return candidatePath;
   }
 
-  const DUP_LIMIT = 1000;
-  let dupIdx = 1;
-  while (true) {
-    ++dupIdx;
-    const candidatePath = `${itemNotesFolder}/${linkpath} ${dupIdx}.md`;
-    if (vault.getAbstractFileByPath(candidatePath) === null) {
-      return candidatePath;
-    }
+  await vault.delete(abstractFile);
 
-    if (dupIdx > DUP_LIMIT) {
-      throw new Error("Could not find path for new pocket item");
-    }
-  }
+  return candidatePath;
+
+  // const DUP_LIMIT = 1000;
+  // let dupIdx = 1;
+  // while (true) {
+  //   ++dupIdx;
+  //   const candidatePath = `${itemNotesFolder}/${linkpath} ${dupIdx}.md`;
+  //   if (vault.getAbstractFileByPath(candidatePath) === null) {
+  //     return candidatePath;
+  //   }
+
+  //   if (dupIdx > DUP_LIMIT) {
+  //     throw new Error("Could not find path for new pocket item");
+  //   }
+  // }
 };
 
 const openItemNote = async (workspace: Workspace, existingItemNote: TFile) => {
@@ -329,7 +334,7 @@ export const createOrOpenItemNote =
           metadataCache
         );
 
-        const fullpath = findPathForNewPocketItem(
+        const fullpath = await findPathForNewPocketItem(
           settingsManager,
           vault,
           pocketItem
@@ -375,7 +380,7 @@ export const bulkCreateItemNotes = async (
   let partialCreationNotice: Notice | null = null;
   const newPocketItemNotes = [];
   for (const [index, pocketItem] of pocketItems.entries()) {
-    const fullpath = findPathForNewPocketItem(
+    const fullpath = await findPathForNewPocketItem(
       settingsManager,
       vault,
       pocketItem

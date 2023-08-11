@@ -225,6 +225,7 @@ const generateInitialItemNoteContents = (
     ["tags", (item) => hashtagSubstitutor(true)(filterTags(item.tags, "blog"))],
     ["tags-no-hash", (item) => hashtagSubstitutor(false)(filterTags(item.tags, "blog"))],
     ["pocket-url", (item) => getPocketItemPocketURL(item)],
+    ["pocket-id", (item) => item.item_id.toString() ?? "Missing Pocket ID"],
     [
       "image",
       (item) => {

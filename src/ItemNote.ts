@@ -23,7 +23,7 @@ import {
   MultiWordTagConversion,
   TagNormalizationFn,
 } from "./Tags";
-import { ensureFolderExists, getPocketItemPocketURL } from "./utils";
+import { ensureFolderExists, getPocketItemPocketURL } from "./Utils";
 
 const DEFAULT_ITEM_NOTES_FOLDER = "/";
 
@@ -205,12 +205,25 @@ const generateInitialItemNoteContents = (
       tags
     );
 
+    const filterTags = (tags: PocketTags, tagToFilterOut: string) => {
+      const filteredTags: PocketTags = {};
+
+      for (const [key, tag] of Object.entries(tags)) {
+        if (tag.tag !== tagToFilterOut) {
+          filteredTags[key] = tag;
+        }
+      }
+    
+      return filteredTags;
+    }
+      
+
   const substitutions: Map<string, SubstitutionFn> = new Map([
     ["title", (item) => normalizeTitle(item.resolved_title) ?? "Untitled"],
     ["url", (item) => item.resolved_url ?? "Missing URL"],
     ["excerpt", (item) => normalizeExcerpt(item.excerpt) ?? "Empty excerpt"],
-    ["tags", (item) => hashtagSubstitutor(true)(item.tags)],
-    ["tags-no-hash", (item) => hashtagSubstitutor(false)(item.tags)],
+    ["tags", (item) => hashtagSubstitutor(true)(filterTags(item.tags, "blog"))],
+    ["tags-no-hash", (item) => hashtagSubstitutor(false)(filterTags(item.tags, "blog"))],
     ["pocket-url", (item) => getPocketItemPocketURL(item)],
     [
       "image",

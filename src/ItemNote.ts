@@ -257,13 +257,24 @@ const findPathForNewPocketItem = async (
   const itemNotesFolder = getItemNotesFolder(settingsManager);
   const linkpath = linkpathForSavedPocketItem(pocketItem);
 
-  const candidatePath = `${itemNotesFolder}/${linkpath}.md`;
-  const abstractFile = vault.getAbstractFileByPath(candidatePath);
-  if (abstractFile === null) {
-    return candidatePath;
-  }
+  const candidateFolder = `${itemNotesFolder}/${pocketItem.item_id}`;
 
-  await vault.delete(abstractFile);
+  const existingFolder = vault.getAbstractFileByPath(candidateFolder);
+
+  if (existingFolder instanceof TFolder) {
+    if(existingFolder) {
+      vault.delete(existingFolder, true);
+    }
+  }
+  await vault.createFolder(candidateFolder);
+
+  const candidatePath = `${candidateFolder}/${linkpath}.md`;
+  // const abstractFile = vault.getAbstractFileByPath(candidatePath);
+  // if (abstractFile === null) {
+  //   return candidatePath;
+  // }
+
+  // await vault.delete(abstractFile);
 
   return candidatePath;
 

@@ -63,13 +63,20 @@ export default class PocketSync extends Plugin {
       return;
     }
 
-    const pocketSyncTag = this.settingsManager.getSetting("pocket-sync-tag");
+    const pocketSyncTagsString: string = this.settingsManager.getSetting("pocket-sync-tag");
+
+    const pocketSyncTags = pocketSyncTagsString?.split(",")?.map((tag) => tag.trim());
+
+    for (const pocketSyncTag of pocketSyncTags) {
+      log.info(`Searching for tag: ${pocketSyncTag}`)
+    }
+
     this.pendingSync = doPocketSync(
       this.itemStore,
       this.metadataStore,
       this.pocketAPI,
       accessInfo,
-      pocketSyncTag
+      pocketSyncTags
     );
     try {
       await this.pendingSync;

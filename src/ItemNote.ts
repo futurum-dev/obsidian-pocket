@@ -205,15 +205,15 @@ const generateInitialItemNoteContents = (
       tags
     );
 
-    const filterTags = (tags: PocketTags, tagToFilterOut: string) => {
+    const filterTags = (tags: PocketTags, tagsToFilterOut: string[]) => {
       const filteredTags: PocketTags = {};
 
       for (const [key, tag] of Object.entries(tags)) {
-        if (tag.tag !== tagToFilterOut) {
+        if (!tagsToFilterOut.includes(tag.tag)) {
           filteredTags[key] = tag;
         }
       }
-    
+
       return filteredTags;
     }
       
@@ -222,8 +222,8 @@ const generateInitialItemNoteContents = (
     ["title", (item) => normalizeTitle(item.resolved_title) ?? "Untitled"],
     ["url", (item) => item.resolved_url ?? "Missing URL"],
     ["excerpt", (item) => normalizeExcerpt(item.excerpt) ?? "Empty excerpt"],
-    ["tags", (item) => hashtagSubstitutor(true)(filterTags(item.tags, "blog"))],
-    ["tags-no-hash", (item) => hashtagSubstitutor(false)(filterTags(item.tags, "blog"))],
+    ["tags", (item) => hashtagSubstitutor(true)(filterTags(item.tags, ["blog", "blog-youtube"]))],
+    ["tags-no-hash", (item) => hashtagSubstitutor(false)(filterTags(item.tags, ["blog", "blog-youtube"]))],
     ["pocket-url", (item) => getPocketItemPocketURL(item)],
     ["pocket-id", (item) => item.item_id.toString() ?? "Missing Pocket ID"],
     [
@@ -251,6 +251,9 @@ const findPathForNewPocketItem = async (
   vault: Vault,
   pocketItem: SavedPocketItem
 ) => {
+
+  //log.info(pocketItem);
+  
   const itemNotesFolder = getItemNotesFolder(settingsManager);
   const linkpath = linkpathForSavedPocketItem(pocketItem);
 

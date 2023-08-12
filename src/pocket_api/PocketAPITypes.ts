@@ -24,11 +24,24 @@ export interface PocketTag {
 
 export type PocketTags = Record<string, PocketTag>;
 
+export interface PocketVideo {
+  item_id: string;
+  vid: string;
+}
+
+export type PocketVideos = Record<string, PocketVideo>;
+
 export interface Image {
   height: number;
   width: number;
   item_id: string;
   src: string;
+}
+
+export enum PocketBoolean {
+  No = 'No',
+  Yes = 'Yes',
+  IsType = 'IsType'
 }
 
 export interface SavedPocketItem extends BasePocketItem {
@@ -37,7 +50,9 @@ export interface SavedPocketItem extends BasePocketItem {
   resolved_url: string;
   excerpt: string;
   tags: PocketTags;
+  videos: PocketVideos;
   image?: Image;
+  has_video: PocketBoolean;
 }
 
 export const pocketTagsToPocketTagList = (tags: PocketTags): PocketTag[] =>
